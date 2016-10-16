@@ -48,7 +48,7 @@ public class Ticket {
 
     @Override
     public String toString(){
-        return("ID= " + this.ticketID + " Issued: " + this.description + " Priority: " + this.priority + " Reported by: "
+        return("ID = " + this.ticketID + " Issued: " + this.description + " Priority: " + this.priority + " Reported by: "
                 + this.reporter + " Reported on: " + this.dateReported);
     }
 

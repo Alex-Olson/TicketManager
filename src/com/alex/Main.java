@@ -14,30 +14,46 @@ public class Main {
         LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
         Scanner scan = new Scanner(System.in);
         while(true){
-            System.out.println("1. Enter Ticket\n2. Delete Ticket\n3. Display All Tickets\n4. Quit");
+            System.out.println("1. Enter Ticket\n" +
+                    "2. Delete Ticket By Id\n" +
+                    "3. Delete Ticket By Issue\n" +
+                    "4. Search By Name\n" +
+                    "5. Display All Tickets\n" +
+                    "6. Quit");
             int task = intInput();
             if (task == 1) {
 //Call addTickets, which will let us enter any number of new tickets
                 addTickets(ticketQueue);
             } else if (task == 2) {
-//delete a ticket
-                deleteTicket(ticketQueue);
-            } else if ( task == 4 ) {
+//delete a ticket by id
+                deleteTicketByID(ticketQueue);
+            } else if (task == 3){
+                //delete ticket by issue
+            } else if (task == 4){
+                //search by name
+                LinkedList<Ticket> searchedTickets = searchTicketByName(ticketQueue);
+                System.out.println("List of found tickets:");
+                for (Ticket t : searchedTickets){
+                    System.out.println(t.toString());
+                }
+            }
+            else if ( task == 6 ) {
 //Quit. Future prototype may want to save all tickets to a file
                 System.out.println("Quitting program");
                 break;
             }
             else {
-//this will happen for 3 or any other selection that is a valid int
-//TODO Program crashes if you enter anything else - please fix
+//this will happen for 5 or any other selection that is a valid int
+
 //Default will be print all tickets
                 printAllTickets(ticketQueue);
             }
         }
         scan.close();
+        numberScanner.close();
     }
 
-    protected static void deleteTicket(LinkedList<Ticket> ticketQueue) {
+    protected static void deleteTicketByID(LinkedList<Ticket> ticketQueue) {
         printAllTickets(ticketQueue); //display list for user
         if (ticketQueue.size() == 0) { //no tickets!
             System.out.println("No tickets to delete!\n");
@@ -64,6 +80,25 @@ public class Main {
             }
         }
         printAllTickets(ticketQueue); //print updated list
+    }
+
+    protected static void deleteTicketByIssue(LinkedList<Ticket> ticketQueue){
+
+    }
+
+    protected static LinkedList<Ticket> searchTicketByName(LinkedList<Ticket> ticketQueue){
+        LinkedList<Ticket> foundTickets = new LinkedList<>();
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter search term");
+        String searchTerm = sc.nextLine();
+
+        for (Ticket t : ticketQueue){
+            if (t.getDescription().contains(searchTerm)){
+                foundTickets.add(t);
+            }
+        }
+
+        return foundTickets;
     }
 
     protected static void addTickets(LinkedList<Ticket> ticketQueue) {

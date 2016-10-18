@@ -1,9 +1,11 @@
 package com.alex;
 
+import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.LinkedList;
-import java.util.Scanner;
 
 public class Main {
     static Scanner numberScanner = new Scanner(System.in);
@@ -13,6 +15,40 @@ public class Main {
 
         LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
+        ArrayList<String> ticketLine = new ArrayList<>();
+        //if there are open tickets, restore the ticket info strings back into the program
+        try (BufferedReader bufReader = new BufferedReader(new FileReader("open_tickets.txt"))){
+            String line = bufReader.readLine();
+            while (line != null) {
+                ticketLine.add(line);
+                line = bufReader.readLine();
+            }
+            bufReader.close();
+
+        } catch (IOException ioe){
+            System.out.println("Unable to find previous open tickets");
+            System.out.println(ioe.toString());
+        }
+        //parse the strings and restore each ticket object
+        for (String s : ticketLine){
+            String[] ticketInfo = s.split(";");
+            //format the date info back to a date. method taken from http://stackoverflow.com/questions/4496359/how-to-parse-date-string-to-date
+            try {
+                String target = ticketInfo[4];
+                DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss zzz yyyy", Locale.ENGLISH);
+                Date ticketDate =  df.parse(target);
+
+                addTicketInPriorityOrder(ticketQueue, new Ticket(Integer.parseInt(ticketInfo[0]), ticketInfo[1], Integer.parseInt(ticketInfo[2]), ticketInfo[3], ticketDate));
+
+            } catch (ParseException pe) {
+                System.out.println(pe.toString());
+            }
+
+
+
+
+        }
+
         Scanner scan = new Scanner(System.in);
         while(true){
             System.out.println("1. Enter Ticket\n" +
@@ -27,12 +63,13 @@ public class Main {
                 addTickets(ticketQueue);
             } else if (task == 2) {
 //delete a ticket by id
+                printAllTickets(ticketQueue); //display list for user
                 System.out.println("Enter ID of ticket to delete");
                 int deleteID = intInput();
-                deleteTicketByID(ticketQueue, deleteID);
+                resolvedTickets.add(deleteTicketByID(ticketQueue, deleteID));
             } else if (task == 3){
                 //delete ticket by issue
-                deleteTicketByIssue(ticketQueue);
+                resolvedTickets.add(deleteTicketByIssue(ticketQueue));
             } else if (task == 4){
                 //search by name
                 searchTicketByName(ticketQueue);
@@ -41,6 +78,29 @@ public class Main {
             else if ( task == 6 ) {
 //Quit. Future prototype may want to save all tickets to a file
                 System.out.println("Quitting program");
+                //save all open tickets to a file
+                try (BufferedWriter bufWriter = new BufferedWriter(new FileWriter("open_tickets.txt"))){
+                    for(Ticket t : ticketQueue){
+                        bufWriter.write(t.toStringToFile() + "\n");
+                    }
+                    bufWriter.close();
+                } catch (IOException ioe){
+                    System.out.println(ioe.toString());
+                }
+
+
+                Date today = new Date();
+                String todayString = today.toString().replace(" ", "_").replace(":", "_");
+
+                //save all resolved tickets from this session
+                try (BufferedWriter bufWriter = new BufferedWriter(new FileWriter("resolved_tickets_as_of_" + todayString + ".txt"))){
+                    for(Ticket t : resolvedTickets){
+                        bufWriter.write(t.toStringToFile() + "\n");
+                    }
+                    bufWriter.close();
+                } catch (IOException ioe){
+                    System.out.println(ioe.toString());
+                }
                 break;
             }
             else {
@@ -55,7 +115,7 @@ public class Main {
     }
 
     protected static Ticket deleteTicketByID(LinkedList<Ticket> ticketQueue, int ticketID) {
-        printAllTickets(ticketQueue); //display list for user
+
         if (ticketQueue.size() == 0) { //no tickets!
             System.out.println("No tickets to delete!\n");
             return null;
@@ -143,7 +203,7 @@ public class Main {
             description = sc.nextLine();
             System.out.println("Who reported this issue?");
             reporter = sc.nextLine();
-            System.out.println("Enter priority of " + description);
+            System.out.println("Enter priority of " + description + " (1 (meh)- 5 (critical)");
             priority = intInput();
             Ticket t = new Ticket(description, priority, reporter, dateReported);
             //ticketQueue.add(t);

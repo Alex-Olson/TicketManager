@@ -12,6 +12,7 @@ public class Main {
 
 
         LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
+        LinkedList<Ticket> resolvedTickets = new LinkedList<>();
         Scanner scan = new Scanner(System.in);
         while(true){
             System.out.println("1. Enter Ticket\n" +
@@ -26,16 +27,16 @@ public class Main {
                 addTickets(ticketQueue);
             } else if (task == 2) {
 //delete a ticket by id
-                deleteTicketByID(ticketQueue);
+                System.out.println("Enter ID of ticket to delete");
+                int deleteID = intInput();
+                deleteTicketByID(ticketQueue, deleteID);
             } else if (task == 3){
                 //delete ticket by issue
+                deleteTicketByIssue(ticketQueue);
             } else if (task == 4){
                 //search by name
-                LinkedList<Ticket> searchedTickets = searchTicketByName(ticketQueue);
-                System.out.println("List of found tickets:");
-                for (Ticket t : searchedTickets){
-                    System.out.println(t.toString());
-                }
+                searchTicketByName(ticketQueue);
+
             }
             else if ( task == 6 ) {
 //Quit. Future prototype may want to save all tickets to a file
@@ -53,37 +54,62 @@ public class Main {
         numberScanner.close();
     }
 
-    protected static void deleteTicketByID(LinkedList<Ticket> ticketQueue) {
+    protected static Ticket deleteTicketByID(LinkedList<Ticket> ticketQueue, int ticketID) {
         printAllTickets(ticketQueue); //display list for user
         if (ticketQueue.size() == 0) { //no tickets!
             System.out.println("No tickets to delete!\n");
-            return;
+            return null;
         }
+        String resolution;
+        Ticket resolvedTicket = new Ticket();
 
         boolean found = false;
         //Loop over all tickets. Delete the one with this ticket ID
         while (found == false) {
-            System.out.println("Enter ID of ticket to delete");
-            int deleteID = intInput();
 
-        for (Ticket ticket : ticketQueue) {
-            if (ticket.getTicketID() == deleteID) {
-                found = true;
-                ticketQueue.remove(ticket);
-                System.out.println(String.format("Ticket %d deleted", deleteID));
-                break; //don't need loop any more.
+            for (Ticket ticket : ticketQueue) {
+                if (ticket.getTicketID() == ticketID) {
+                    found = true;
+                    resolvedTicket = ticket;
+                    Scanner sc = new Scanner(System.in);
+                    System.out.println("Please enter the resolution for this ticket.");
+                    resolution = sc.nextLine();
+
+                    resolvedTicket.setResolution(new Date(), resolution);
+                    ticketQueue.remove(ticket);
+
+                    System.out.println(String.format("Ticket %d deleted", ticketID));
+
+                    break; //don't need loop any more.
+                }
             }
-        }
             //if the ticket id isn't found, the user will be asked to redo the deletion
             if (!found) {
                 System.out.println("Ticket ID not found, no ticket deleted");
             }
         }
+
+
         printAllTickets(ticketQueue); //print updated list
+        return resolvedTicket;
+
     }
 
-    protected static void deleteTicketByIssue(LinkedList<Ticket> ticketQueue){
+    protected static Ticket deleteTicketByIssue(LinkedList<Ticket> ticketQueue){
 
+        LinkedList<Ticket> searchedTickets = searchTicketByName(ticketQueue);
+        Ticket resolvedTicket = new Ticket();
+
+        System.out.println("Enter the ID of the ticket you wanted to delete.");
+        int deleteID = intInput();
+
+        for (Ticket t : searchedTickets){
+            if (deleteID == t.getTicketID()){
+                resolvedTicket = deleteTicketByID(ticketQueue, deleteID);
+                break;
+            }
+        }
+        return resolvedTicket;
     }
 
     protected static LinkedList<Ticket> searchTicketByName(LinkedList<Ticket> ticketQueue){
@@ -96,6 +122,11 @@ public class Main {
             if (t.getDescription().contains(searchTerm)){
                 foundTickets.add(t);
             }
+        }
+
+        System.out.println("List of found tickets:");
+        for (Ticket t : foundTickets){
+            System.out.println(t.toString());
         }
 
         return foundTickets;

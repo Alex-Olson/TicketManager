@@ -9,9 +9,13 @@ public class Ticket {
     private String reporter;
     private String description;
     private Date dateReported;
+    private Date resolutionDate;
+    private String resolution;
 
     private static int staticTicketIDCounter = 1;
     protected int ticketID;
+
+    public Ticket(){}
 
     public Ticket(String desc, int p, String rep, Date date){
         this.description = desc;
@@ -20,6 +24,11 @@ public class Ticket {
         this.dateReported = date;
         this.ticketID = staticTicketIDCounter;
         staticTicketIDCounter++;
+    }
+
+    public void setResolution(Date resolutionDate, String resolution){
+        this.resolutionDate = resolutionDate;
+        this.resolution = resolution;
     }
 
     protected int getPriority() {
@@ -45,6 +54,8 @@ public class Ticket {
     public int getTicketID() {
         return ticketID;
     }
+
+
 
     @Override
     public String toString(){

@@ -107,11 +107,11 @@ public class TicketManagerGUI extends JFrame {
                         Ticket toDelete = activeTicketList.getSelectedValue();
                         toDelete.setResolution(new Date(), resolutionTextField.getText());
 
-                        int quit = JOptionPane.showConfirmDialog(TicketManagerGUI.this, "You are going to delete\n"
-                                        + toDelete.getDescription() + " with a resolution of " + toDelete.getResolution()
-                                , "Quit", JOptionPane.OK_CANCEL_OPTION);
+                        int confirm = JOptionPane.showConfirmDialog(TicketManagerGUI.this, "You are going to delete" + toDelete.getDescription() +
+                                        "\n with a resolution of " + toDelete.getResolution()
+                                , "Confirm Deletion", JOptionPane.OK_CANCEL_OPTION);
 
-                        if (quit == JOptionPane.OK_OPTION) {
+                        if (confirm == JOptionPane.OK_OPTION) {
                             resolvedTickets.add(toDelete);
                             ticketListModel.removeElement(toDelete);
                         }

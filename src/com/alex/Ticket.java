@@ -55,6 +55,10 @@ public class Ticket {
         return description;
     }
 
+    public String getResolution() {
+        return resolution;
+    }
+
     public Date getDateReported() {
         return dateReported;
     }

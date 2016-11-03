@@ -10,7 +10,7 @@ import java.util.Date;
 public class Main {
 
 
-    static Scanner numberScanner = new Scanner(System.in);
+   // static Scanner numberScanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         TicketManagerGUI gui = new TicketManagerGUI();
